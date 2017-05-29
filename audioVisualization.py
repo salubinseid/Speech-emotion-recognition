@@ -54,9 +54,12 @@ def plot_log_power_specgram(sound_names,raw_sounds):
     plt.suptitle("Figure 3: Log power spectrogram",x=0.5, y=0.915,fontsize=18)
     plt.show()
 
-sound_file_paths = ["data/00.wav","data/01.wav","data/02.wav","data/03.wav","data/04.wav","data/05.wav","data/06.wav","data/07.wav","data/08.wav","data/09.wav"]
+sound_file_paths = ["Sound-Data/00.wav","Sound-Data/01.wav","Sound-Data/02.wav","Sound-Data/fra.wav","Sound-Data/04.wav","Sound-Data/05.wav","Sound-Data/06.wav","Sound-Data/07.wav","Sound-Data/08.wav","Sound-Data/09.wav"]
 
-sound_names = ["air conditioner","car horn","children playing","dog bark","drilling","engine idling", "gun shot","jackhammer","siren","street music"]
+
+# {angry, happy, sad, neutral, frustrated, excited, fearful, surprised, disgusted, other} 
+
+sound_names = ["angry","happy","sad","frustrated","excited","fearful", "surprised","disgusted","neutral","other"]
 
 
 raw_sounds = load_sound_files(sound_file_paths)
