@@ -15,14 +15,18 @@ The IEMOCAP dataset used for model training. Another related dataset that can be
 
 
 The dataset is organized as indicated bellow:
-
 Fold1 - angry
-Fold2 - happy
-Fold3 - sad
-Fold4 - neutral
-Fold5 - frustrated
-Fold6 - excited
-Fold7 - fearful
-Fold8 - surprised,
-Fold9 - disgusted
-Fold10 - other
+Fold2 - exc
+Fold3 - fea
+Fold4 - fru
+Fold5 - happy
+Fold6 - neu 
+Fold7 - sad
+fold8 - sur 
+
+
+
+
+
+
+
