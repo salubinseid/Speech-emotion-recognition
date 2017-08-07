@@ -1,6 +1,8 @@
 
 import sys
 import time
+from time import gmtime, strftime
+
 import os
 import glob
 import numpy
@@ -44,49 +46,68 @@ def extract_feature(file_name):
     contrast = np.mean(librosa.feature.spectral_contrast(S=stft, sr=sample_rate).T,axis=0)
     tonnetz = np.mean(librosa.feature.tonnetz(y=librosa.effects.harmonic(X),
     sr=sample_rate).T,axis=0)
-    return mfccs,chroma,mel,contrast,tonnetz
+    #return mfccs,chroma,mel,contrast,tonnetz
+    return mfccs,chroma,mel
 
 def parse_audio_files(parent_dir,sub_dirs,file_ext="*.wav"):
-    features, labels = np.empty((0,193)), np.empty(0)
+    features, labels = np.empty((0,180)), np.empty(0)
+    #features, labels = np.empty((0,193)), np.empty(0)
     
     for label, sub_dir in enumerate(sub_dirs):
     	
         for fn in glob.glob(os.path.join(parent_dir, sub_dir, file_ext)):
+            
             try:
-              mfccs, chroma, mel, contrast,tonnetz = extract_feature(fn) # function calling 
+              mfccs, chroma, mel = extract_feature(fn) # function calling 
+              #mfccs, chroma, mel, contrast,tonnetz = extract_feature(fn) # function calling 
             except Exception as e:
               print "Error encountered while parsing file: ", fn
               continue
-            ext_features = np.hstack([mfccs,chroma,mel,contrast,tonnetz])
+            ext_features = np.hstack([mfccs,chroma,mel])
             features = np.vstack([features,ext_features])
-            labels = np.append(labels, fn.split('/')[2].split('-')[1])
-    	
+            labels = np.append(labels, fn.split('/')[2].split('-')[0])
+
+            print "processing emotion cate: ", fn.split('/')[2].split('-')[0], "at ", strftime("%Y-%m-%d %H:%M:%S", gmtime())
+
     return np.array(features), np.array(labels, dtype = np.int)
 
 def one_hot_encode(labels):
-    n_labels = len(labels)
+    
+    """
+    labels - holds array of input categories eg [0 2 0 0 0 1 1 1 1 1] 
+    n_labels  - holds the number of input data eg 10 
+    n_unique_labels - holds the number of categories  eg 3 
+    one_hot_encode - 
+    """
 
+    n_labels = len(labels) 
     n_unique_labels = len(np.unique(labels))
-    one_hot_encode = np.zeros((n_labels,n_unique_labels))
+    
+    one_hot_encode = np.zeros((n_labels,n_unique_labels))  # create an array of zeros 10 by 3 
+    #print one_hot_encode
+
     one_hot_encode[np.arange(n_labels), labels] = 1
-   
+    #print one_hot_encode
     
     return one_hot_encode
 
-parent_dir = 'Sound-Data'
-tr_sub_dirs = ["fold1","fold2","fold3","fold4","fold5","fold6","fold7","fold8","fold9","fold10"]
-# Fold1 - angry , Fold2 - happy, Fold3 - sad, Fold4 - neutral, Fold5 - frustrated, Fold6 - excited, 
-# Fold7 - fearful, Fold8 - surprised, Fold9 - disgusted, Fold10 - other
+parent_dir = 'Sound-Data' # Training directory 
+tr_sub_dirs = ["angry","exc","fea","fru","hap","neu","sad","sur"]
+#tr_sub_dirs = ["fold1","fold2", "fold3", "fold4"]
+# angry, excited, Fear, frustration,happy, neutral, sad, surprised
 
-ts_sub_dirs = ["fold-ts"]
+ts_sub_dirs = ["fold-ts"]   # testing Directory 
+#ts_sub_dirs = ["fold-ts2"]   # testing Directory 
 
-tr_features, tr_labels = parse_audio_files(parent_dir,tr_sub_dirs)
-ts_features, ts_labels = parse_audio_files(parent_dir,ts_sub_dirs)
+tr_features, tr_labels = parse_audio_files(parent_dir,tr_sub_dirs) # Training Features 
 tr_labels = one_hot_encode(tr_labels)
+#print tr_labels
+
+ts_features, ts_labels = parse_audio_files(parent_dir,ts_sub_dirs) # Testing Features 
 ts_labels = one_hot_encode(ts_labels)
 
-#print tr_features
-
+#print tr_features # number of training features 
+#print ts_labels   # number of labels like angry 
 
 np.savetxt("tr_features.txt", tr_features)  # save array value to the text file
 np.savetxt("tr_labels.txt", tr_labels)
